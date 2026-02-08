@@ -6,6 +6,7 @@ import { m, getError } from '@/composables/logic/useValidationUtils'
 
 // Importar stores
 import { useCompanyStore } from "@/stores/company.js";
+import { useAccessStore } from "@/stores/access";
 // Importar composables
 import useCompany from "@/composables/services/company";
 import { useFileHandler } from '@/composables/logic/useFileHandler'
@@ -16,6 +17,9 @@ import { showToast } from '@/utils/toastUtils';
 // Store de company
 const useComp = useCompanyStore();
 const { company } = storeToRefs(useComp);
+// Store de accesos
+const useAccess = useAccessStore();
+const { permissions } = storeToRefs(useAccess);
 
 // Composables inicializados
 const {
@@ -182,7 +186,7 @@ watch(errorUpdateCompany, (received) => {
                     </v-row>
                 </v-card-text>
 
-                <v-card-actions>
+                <v-card-actions v-if="permissions.includes('compania.createOrUpdate')">
                     <v-spacer></v-spacer>
                     <v-btn color="primary" variant="elevated" class="px-8 rounded-pill" type="submit"
                         :disabled="loadingUpdateCompany">
