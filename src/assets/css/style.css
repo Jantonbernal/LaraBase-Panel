@@ -1,0 +1,65 @@
+/* Global Styles */
+#app {
+    background-color: rgb(var(--v-theme-background));
+    font-size: 12px !important;
+}
+
+/* Adjust sidebar height and border */
+.sidebar {
+    height: calc(100% - 40px) !important;
+}
+
+.v-list-item-title {
+    font-size: .700rem !important;
+    font-weight: 500 !important;
+    text-transform: uppercase !important;
+}
+
+.v-list-item--variant-text .v-list-item__overlay {
+    color: rgb(var(--v-theme-primary)) !important;
+}
+
+.company-title {
+    font-size: .750rem !important;
+    font-weight: 1000 !important;
+    text-transform: uppercase !important;
+}
+
+/* Se asegura que los modales de SweetAlert2 estén por encima de otros elementos */
+.swal2-container {
+    z-index: 100000 !important;
+}
+
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+    .v-input--horizontal {
+        width: 80% !important;
+    }
+}
+
+/* Medium devices (tablets, 1270px to 1499px) */
+@media only screen and (min-width: 1270px) and (max-width: 1499px) {
+    .topbar {
+        width: calc(100% - 25%) !important;
+        margin-left: 50px !important;
+        margin-right: 0px !important;
+    }
+
+    .topbar-sidebar-off {
+        width: calc(100% - 8%) !important;
+    }
+}
+
+/* Large devices (laptops/desktops, 1270px and up) */
+@media only screen and (min-width: 1500px) {
+    .topbar {
+        width: calc(100% - 25%) !important;
+        margin-left: 50px !important;
+        margin-right: 0px !important;
+    }
+
+    .topbar-sidebar-off {
+        width: calc(100% - 8%) !important;
+    }
+}
