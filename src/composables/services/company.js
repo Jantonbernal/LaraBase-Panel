@@ -11,7 +11,7 @@ export default function useCompany() {
     }
 
     const updateCompany = async (id, params, headers) => {
-        updateCompany_('PUT', 'company/' + id, params, headers)
+        updateCompany_('POST', 'company/' + id, params, headers)
     }
 
     return {

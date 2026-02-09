@@ -13,6 +13,7 @@ import { useFileHandler } from '@/composables/logic/useFileHandler'
 // Importar componentes
 import OverlayLoaders from '@/components/Common/OverlayLoaders.vue';
 import { showToast } from '@/utils/toastUtils';
+import { prepareFormData } from '@/utils/formHelpers'
 
 // Store de company
 const useComp = useCompanyStore();
@@ -76,6 +77,7 @@ watch(dataShowCompany, (val) => {
     if (val) {
         company.value = val.data
         Object.assign(form, val.data);
+        imagePreview.value = val.data?.logo.url
     }
 })
 
@@ -95,7 +97,9 @@ const save = async () => {
     const isFormCorrect = await v$.value.$validate()
     if (!isFormCorrect) return
 
-    updateCompany(form.id, form)
+    const dataToSend = prepareFormData(form, 'update')
+
+    updateCompany(form.id, dataToSend)
 }
 
 // Verifica que se haya registrado exitosamente

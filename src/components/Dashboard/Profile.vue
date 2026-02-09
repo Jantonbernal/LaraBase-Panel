@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 
@@ -21,7 +21,7 @@ const router = useRouter();
 
 // Store de accesos
 const useAccess = useAccessStore();
-const { access, role } = storeToRefs(useAccess);
+const { access, role, permissions } = storeToRefs(useAccess);
 // Store de company
 const useCompany = useCompanyStore();
 const { company } = storeToRefs(useCompany);
@@ -55,9 +55,19 @@ watch(errorLogout, (newValue) => {
 });
 
 const items = ref([
-    { text: 'Mi Perfil', 'icon': 'mdi mdi-account-tie', modalShow: false, modalName: 'usuario.perfil' },
-    { text: 'Roles', 'icon': 'mdi mdi-lock-check', modalShow: true, modalName: 'role.select' },
+    { text: 'Mi Perfil', 'icon': 'mdi mdi-account-tie', modalShow: false, modalName: 'usuario.perfil', requirePermission: true },
+    { text: 'Roles', 'icon': 'mdi mdi-lock-check', modalShow: true, modalName: 'role.select', requirePermission: false },
 ])
+
+const filteredItems = computed(() => {
+    return items.value.filter(item => {
+        // Si NO requiere permiso, pasa directo
+        if (!item.requirePermission) return true;
+
+        // Si requiere permiso, validamos que exista en el store
+        return permissions.value.includes(item.modalName);
+    });
+});
 
 const verifyModalToChange = (item) => {
     if (item.modalShow) {
@@ -98,12 +108,13 @@ const verifyModalToChange = (item) => {
             <v-divider></v-divider>
 
             <v-list class="py-0" lines="one" density="compact">
-                <v-list-item v-for="(item, i) in items" :key="i" :value="i" color="primary">
-                    <v-list-item-title class="pl-1 text-body-1" v-text="item.text"
-                        @click="verifyModalToChange(item)"></v-list-item-title>
+                <v-list-item v-for="(item, i) in filteredItems" :key="item.modalName" :value="i" color="primary"
+                    @click="verifyModalToChange(item)">
                     <template v-slot:prepend>
                         <v-icon size="small" :icon="item.icon"></v-icon>
                     </template>
+
+                    <v-list-item-title class="pl-1 text-body-1" v-text="item.text"></v-list-item-title>
                 </v-list-item>
             </v-list>
 
