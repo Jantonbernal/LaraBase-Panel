@@ -126,6 +126,9 @@ const verifyModalToChange = (item) => {
                     <template v-slot:loader>
                         <v-progress-linear indeterminate></v-progress-linear>
                     </template>
+                    <template v-slot:prepend>
+                        <v-icon size="small" :icon="'mdi mdi-logout'"></v-icon>
+                    </template>
                 </v-btn>
             </div>
         </v-sheet>

@@ -9,6 +9,7 @@ const PermissionIndex = () => import('@/components/Modules/permission/pages/Inde
 const RoleIndex = () => import('@/components/Modules/role/pages/Index.vue');
 const UserIndex = () => import('@/components/Modules/user/pages/Index.vue');
 const UserCreate = () => import('@/components/Modules/user/pages/Create.vue');
+const UserProfile = () => import('@/components/Modules/user/pages/Profile.vue');
 const UserEdit = () => import('@/components/Modules/user/pages/Edit.vue');
 const MenuIndex = () => import('@/components/Modules/menu/pages/Index.vue');
 const CompanyCreateOrUpdate = () => import('@/components/Modules/company/createOrUpdate.vue');
@@ -106,6 +107,15 @@ const routes = [
                 component: UserEdit,
                 meta: {
                     title: 'Editar Usuario',
+                    requiresAuth: true,
+                },
+            },
+            {
+                path: '/dashboard/usuario/profile',
+                name: 'usuario.perfil',
+                component: UserProfile,
+                meta: {
+                    title: 'Perfil de Usuario',
                     requiresAuth: true,
                 },
             },
