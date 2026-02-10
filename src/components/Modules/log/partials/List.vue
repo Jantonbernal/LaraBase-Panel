@@ -76,9 +76,9 @@ const formatJSON = (payload) => {
         <!-- Buscador -->
         <v-row>
             <v-col cols="12" md="4">
-                <v-text-field :loading="loadingIndexLogs" append-inner-icon="mdi-magnify" density="compact" label="Buscar..."
-                    placeholder="Buscar logs..." variant="solo-filled" v-model="search" single-line hide-details
-                    @click:append-inner="searchResults" @keyup.enter="searchResults"></v-text-field>
+                <v-text-field :loading="loadingIndexLogs" append-inner-icon="mdi-magnify" density="compact"
+                    label="Buscar..." placeholder="Buscar logs..." variant="solo-filled" v-model="search" single-line
+                    hide-details @click:append-inner="searchResults" @keyup.enter="searchResults"></v-text-field>
             </v-col>
         </v-row>
 
@@ -88,12 +88,23 @@ const formatJSON = (payload) => {
                 <v-expansion-panel v-for="log in dataIndexLogs?.data" :key="log.id">
                     <v-expansion-panel-title>
                         <v-row no-gutters align="center" class="w-100">
-                            <v-col cols="6" md="2">
+                            <v-col cols="6" md="1">
+                                <v-chip :color="'gray'" label class="font-weight-bold">
+                                    #{{ log.id }}
+                                </v-chip>
+                            </v-col>
+                            <v-col cols="6" md="1">
                                 <v-chip :color="getMethodColor(log.method)" size="small" label class="font-weight-bold">
                                     {{ log.method }}
                                 </v-chip>
                             </v-col>
-                            <v-col cols="6" md="4" class="text-body-2 text-grey">
+                            <v-col cols="6" md="1">
+                                <v-chip :color="log.status == 'success' ? 'green' : 'error'" size="small" label
+                                    class="font-weight-bold">
+                                    {{ log.status }}
+                                </v-chip>
+                            </v-col>
+                            <v-col cols="6" md="3" class="text-body-2 text-grey">
                                 <span class="font-weight-bold">{{ log.route }}</span>
                             </v-col>
                             <v-col cols="12" md="3" class="text-caption">
