@@ -1,18 +1,22 @@
 import { computed, reactive, ref, watch } from "vue"
 import { useVuelidate } from '@vuelidate/core'
+import { useTablePagination } from '@/composables/logic/useTablePagination';
 import { m } from '@/composables/logic/useValidationUtils'
 import { showAlert, showConfirmAlert } from "@/utils/swalUtils";
 import { showToast } from '@/utils/toastUtils';
 
 export default function useMenuForm(permissions, menuService, authService, menus) {
 
+    const {
+        page,
+        search,
+        resetAndFetch: searchResults // Renombramos resetAndFetch a searchResults para no romper el resto de tu código
+    } = useTablePagination(menuService.indexMenus);
+
     // Params Tree
     const mode = ref(null);
     const active = ref([]);
     const open = ref([]);
-    // Paginacion y Busqueda
-    const page = ref(1);
-    const search = ref(null);
     // Tipos de Jerarquias
     const hierarchyOptions = ref([{ id: '1', title: 'Padre' }, { id: '2', title: 'Hijo' }]);
 
@@ -94,11 +98,6 @@ export default function useMenuForm(permissions, menuService, authService, menus
         menuService.errorUpdateMenu.value = null;
     };
 
-    const searchResults = () => {
-        page.value = 1;
-        menuService.indexMenus({ page: page.value, search: search.value });
-    };
-
     const handleStatusChange = async (item) => {
         if (!menuService.dataIndexMenus.value?.data.length) return;
 
@@ -138,26 +137,6 @@ export default function useMenuForm(permissions, menuService, authService, menus
     // Carga los datos del menu seleccionado
     watch(menuService.dataShowMenu, (val) => {
         if (val) Object.assign(form, val.data);
-    });
-
-    let debounceTimer = null;
-    // Observamos los cambios
-    watch([page, search], ([newPage, newSearch], [oldPage, oldSearch]) => {
-        // Si lo que cambió fue la PÁGINA, disparamos de inmediato
-        if (newPage !== oldPage) {
-            return menuService.indexMenus({ page: newPage, search: newSearch });
-        }
-
-        // Si lo que cambió fue el BUSCADOR, usamos Debounce
-        if (newSearch !== oldSearch) {
-            // Limpiamos el temporizador anterior
-            clearTimeout(debounceTimer);
-
-            // Creamos un nuevo temporizador
-            debounceTimer = setTimeout(() => {
-                searchResults()
-            }, 500); // Espera 500ms después de que el usuario deja de escribir
-        }
     });
 
     // 1. Helper para acciones comunes de éxito
