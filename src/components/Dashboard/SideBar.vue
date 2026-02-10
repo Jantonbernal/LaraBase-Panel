@@ -1,6 +1,8 @@
 <script setup>
-import { watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
+import { useRouter, useRoute } from 'vue-router';
+
 // Importar stores
 import { useCompanyStore } from "@/stores/company.js";
 import { useMenuStore } from "@/stores/menu.js";
@@ -8,6 +10,12 @@ import { useMenuStore } from "@/stores/menu.js";
 import useCompanyService from "@/composables/services/company";
 // Favicon management
 import { useFavicon } from '@vueuse/core'
+// Importar utilidades
+import { showAlert } from "@/utils/swalUtils";
+
+const router = useRouter();
+const route = useRoute();
+
 
 // Store de company
 const useCompany = useCompanyStore();
@@ -19,7 +27,13 @@ const { drawer, menus } = storeToRefs(useMenu);
 // Inicializar composables
 const { dataShowCompany, showCompany } = useCompanyService();
 
-showCompany(1);
+onMounted(() => {
+    showCompany(1);
+    selectedMenu.value = route.name;
+})
+
+// Captura el name del menú seleccionado
+const selectedMenu = ref(null);
 
 // Está atento a cambios para setear los datos de la empresa
 watch(dataShowCompany, (received) => {
@@ -34,6 +48,16 @@ watch(dataShowCompany, (received) => {
     }
 })
 
+const navigateTo = (path) => {
+    if (router.hasRoute(path)) {
+        selectedMenu.value = path;
+        router.push({
+            name: path,
+        });
+    } else {
+        return showAlert({ title: "Opps!", text: "El lugar que desea visitar no existe.", icon: "error" });
+    }
+}
 </script>
 
 <template>
@@ -57,9 +81,8 @@ watch(dataShowCompany, (received) => {
                         v-show="item.all_children_menus.length > 0" density="compact" rounded="lg"></v-list-item>
                 </template>
 
-                <!-- :to="{ name: child.permission.slug }" -->
                 <v-list-item v-for="(child, i) in item.all_children_menus" :key="i" density="compact" class="my-1"
-                    rounded="lg" :to="{ name: child.permission.slug }">
+                    rounded="lg" @click.prevent="navigateTo(child.permission.slug)">
                     <template v-slot:prepend>
                         <v-icon :icon="child.icon"></v-icon>
                     </template>

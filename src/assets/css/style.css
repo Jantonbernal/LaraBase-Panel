@@ -25,9 +25,64 @@
     text-transform: uppercase !important;
 }
 
+/* INICIO DE CONFIGURACIÓN DE ESTILOS DE SWEETALERT 2 */
+/* Estilos personalizados para SweetAlert2 con Vuetify */
+:root {
+    --swal-bg: rgb(var(--v-theme-surface));
+    /* Fondo */
+    --swal-title: rgb(var(--v-theme-on-surface));
+    /* Color del título */
+    --swal-text: rgb(var(--v-theme-on-surface));
+    /* Color del texto */
+    --swal-confirm-btn: rgb(var(--v-theme-primary));
+    /* Botón de confirmación */
+    --swal-cancel-btn: rgb(var(--v-theme-secondary));
+    /* Botón de cancelación */
+    --swal-icon-success: rgb(var(--v-theme-success));
+    --swal-icon-error: rgb(var(--v-theme-error));
+    --swal-icon-warning: rgb(var(--v-theme-warning));
+    --swal-icon-info: rgb(var(--v-theme-info));
+}
+
+
 /* Se asegura que los modales de SweetAlert2 estén por encima de otros elementos */
 .swal2-container {
     z-index: 100000 !important;
+}
+
+.swal2-popup {
+    background-color: var(--swal-bg) !important;
+    color: var(--swal-text) !important;
+}
+
+.swal2-title {
+    color: var(--swal-title) !important;
+}
+
+.swal2-confirm {
+    background-color: var(--swal-confirm-btn) !important;
+    border-color: var(--swal-confirm-btn) !important;
+}
+
+.swal2-cancel {
+    background-color: var(--swal-cancel-btn) !important;
+    border-color: var(--swal-cancel-btn) !important;
+}
+
+.swal2-success {
+    color: var(--swal-icon-success) !important;
+}
+
+.swal2-error {
+    color: var(--swal-icon-error) !important;
+}
+
+.swal2-warning {
+    color: var(--swal-icon-warning) !important;
+}
+
+.swal2-info {
+    color: var(--swal-icon-info) !important;
 }
 
 
@@ -37,6 +92,8 @@
         width: 80% !important;
     }
 }
+
+/* FIN DE CONFIGURACIÓN DE ESTILOS DE SWEETALERT 2 */
 
 /* Medium devices (tablets, 1270px to 1499px) */
 @media only screen and (min-width: 1270px) and (max-width: 1499px) {
