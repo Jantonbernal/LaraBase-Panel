@@ -7,6 +7,7 @@ import { useAccessStore } from "@/stores/access";
 import { useModalStore } from "@/stores/modal.js";
 // Importar composables
 import useRole from "@/composables/services/role";
+import { useTablePagination } from "@/composables/logic/useTablePagination";
 // Importar componentes
 import Loading from '@/components/Common/Loading.vue';
 import Alert from '@/components/Common/Alert.vue';
@@ -32,13 +33,12 @@ const {
     dataIndexRoles, numberOfPages, indexRoles, loadingIndexRoles,
     dataToggleRole, toggleRole, loadingToggleRole, errorToggleRole
 } = useRole();
+const { page, search, resetAndFetch } = useTablePagination(indexRoles)
 
 onMounted(async () => {
-    indexRoles({ page: page.value, search: search.value });
+    resetAndFetch();
 })
 
-const page = ref(1);
-const search = ref(null)
 const headers = [
     { title: 'ID', key: 'id' },
     { title: 'Nombre', key: 'name' },
@@ -46,33 +46,6 @@ const headers = [
     { title: 'Fecha de Registro', key: 'created_at' },
     { title: 'Acciones', key: 'actions' },
 ];
-
-let debounceTimer = null;
-// Observamos los cambios
-watch([page, search], ([newPage, newSearch], [oldPage, oldSearch]) => {
-    // Si lo que cambió fue la PÁGINA, disparamos de inmediato
-    if (newPage !== oldPage) {
-        indexRoles({ page: newPage, search: newSearch });
-        return;
-    }
-
-    // Si lo que cambió fue el BUSCADOR, usamos Debounce
-    if (newSearch !== oldSearch) {
-        // Limpiamos el temporizador anterior
-        clearTimeout(debounceTimer);
-
-        // Creamos un nuevo temporizador
-        debounceTimer = setTimeout(() => {
-            page.value = 1; // Al buscar, siempre volvemos a la pág 1
-            indexRoles({ page: page.value, search: newSearch });
-        }, 500); // Espera 500ms después de que el usuario deja de escribir
-    }
-});
-
-const searchResults = () => {
-    page.value = 1;
-    indexRoles({ page: page.value, search: search.value });
-}
 
 const changeStatus = async (item) => {
     if (!dataIndexRoles.value?.data.length) {
@@ -99,19 +72,18 @@ const showModal = (modalName, id = null) => {
 }
 
 const closeModal = () => {
-    searchResults()
+    resetAndFetch()
 }
 
 watch(dataToggleRole, (received) => {
     if (received) {
-        searchResults()
+        resetAndFetch()
         showToast(received?.message, 'success', 5000)
     }
 })
 
 watch(errorToggleRole, (received) => {
     if (received) {
-        searchResults()
         showToast(received?.data?.message || "Ocurrió un error", 'error', 5000)
     }
 })
@@ -128,7 +100,7 @@ watch(errorToggleRole, (received) => {
             <v-col cols="12" md="4">
                 <v-text-field :loading="loadingIndexRoles" append-inner-icon="mdi-magnify" density="compact"
                     label="Buscar..." placeholder="Buscar Roles..." variant="solo-filled" v-model="search" single-line
-                    hide-details @click:append-inner="searchResults" @keyup.enter="searchResults"></v-text-field>
+                    hide-details @click:append-inner="resetAndFetch" @keyup.enter="resetAndFetch"></v-text-field>
             </v-col>
             <!-- Botón Crear -->
             <v-col cols="12" md="4">

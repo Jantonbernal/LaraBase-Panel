@@ -3,43 +3,18 @@ import { onMounted, ref, watch } from "vue";
 
 // Importar composables
 import useLog from "@/composables/services/log";
+import { useTablePagination } from "@/composables/logic/useTablePagination";
 // Importar componentes
 import Loading from '@/components/Common/Loading.vue';
 import Alert from '@/components/Common/Alert.vue';
 import Paginator from '@/components/Common/Paginator.vue';
 
 const { dataIndexLogs, numberOfPages, indexLogs, loadingIndexLogs } = useLog();
+const { page, search, resetAndFetch } = useTablePagination(indexLogs)
 
 onMounted(async () => {
-    indexLogs({ page: page.value, search: search.value });
+    resetAndFetch();
 })
-
-const page = ref(1);
-const search = ref(null)
-
-let debounceTimer = null;
-
-// Observamos los cambios
-watch([page, search], ([newPage, newSearch], [oldPage, oldSearch]) => {
-
-    // Si lo que cambió fue la PÁGINA, disparamos de inmediato
-    if (newPage !== oldPage) {
-        indexLogs({ page: newPage, search: newSearch });
-        return;
-    }
-
-    // Si lo que cambió fue el BUSCADOR, usamos Debounce
-    if (newSearch !== oldSearch) {
-        // Limpiamos el temporizador anterior
-        clearTimeout(debounceTimer);
-
-        // Creamos un nuevo temporizador
-        debounceTimer = setTimeout(() => {
-            page.value = 1; // Al buscar, siempre volvemos a la pág 1
-            indexLogs({ page: page.value, search: newSearch });
-        }, 500); // Espera 500ms después de que el usuario deja de escribir
-    }
-});
 
 const searchResults = () => {
     page.value = 1;
@@ -78,7 +53,7 @@ const formatJSON = (payload) => {
             <v-col cols="12" md="4">
                 <v-text-field :loading="loadingIndexLogs" append-inner-icon="mdi-magnify" density="compact"
                     label="Buscar..." placeholder="Buscar logs..." variant="solo-filled" v-model="search" single-line
-                    hide-details @click:append-inner="searchResults" @keyup.enter="searchResults"></v-text-field>
+                    hide-details @click:append-inner="resetAndFetch" @keyup.enter="resetAndFetch"></v-text-field>
             </v-col>
         </v-row>
 
