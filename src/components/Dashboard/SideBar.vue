@@ -93,3 +93,10 @@ const navigateTo = (path) => {
         </v-list>
     </v-navigation-drawer>
 </template>
+
+<style scoped>
+.active {
+    font-weight: bold;
+    color: rgb(var(--v-theme-primary)) !important
+}
+</style>
