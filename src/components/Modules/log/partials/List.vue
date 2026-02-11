@@ -16,11 +16,6 @@ onMounted(async () => {
     resetAndFetch();
 })
 
-const searchResults = () => {
-    page.value = 1;
-    indexLogs({ page: page.value, search: search.value });
-}
-
 // Colores según el método HTTP
 const getMethodColor = (method) => {
     const colors = {
@@ -63,30 +58,30 @@ const formatJSON = (payload) => {
                 <v-expansion-panel v-for="log in dataIndexLogs?.data" :key="log.id">
                     <v-expansion-panel-title>
                         <v-row no-gutters align="center" class="w-100">
-                            <v-col cols="6" md="1">
-                                <v-chip :color="'gray'" label class="font-weight-bold">
+                            <v-col cols="4" md="1">
+                                <v-chip :color="'gray'" label class="font-weight-bold mb-2">
                                     #{{ log.id }}
                                 </v-chip>
                             </v-col>
-                            <v-col cols="6" md="1">
-                                <v-chip :color="getMethodColor(log.method)" size="small" label class="font-weight-bold">
+                            <v-col cols="4" md="1">
+                                <v-chip :color="getMethodColor(log.method)" size="small" label class="font-weight-bold mb-2">
                                     {{ log.method }}
                                 </v-chip>
                             </v-col>
-                            <v-col cols="6" md="1">
+                            <v-col cols="4" md="1">
                                 <v-chip :color="log.status == 'success' ? 'green' : 'error'" size="small" label
-                                    class="font-weight-bold">
+                                    class="font-weight-bold mb-2">
                                     {{ log.status }}
                                 </v-chip>
                             </v-col>
-                            <v-col cols="6" md="3" class="text-body-2 text-grey">
+                            <v-col cols="12" md="3" class="text-body-2 text-grey mb-2">
                                 <span class="font-weight-bold">{{ log.route }}</span>
                             </v-col>
-                            <v-col cols="12" md="3" class="text-caption">
+                            <v-col cols="12" md="3" class="text-caption mb-2">
                                 <v-icon size="small" icon="mdi-account-circle" class="mr-1"></v-icon>
                                 {{ log.user?.full_name || 'Sistema' }}
                             </v-col>
-                            <v-col cols="12" md="3" class="text-caption">
+                            <v-col cols="12" md="3" class="text-caption mb-2">
                                 {{ log.created_at }}
                             </v-col>
                         </v-row>
