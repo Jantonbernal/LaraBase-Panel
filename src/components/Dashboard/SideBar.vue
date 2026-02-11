@@ -16,7 +16,6 @@ import { showAlert } from "@/utils/swalUtils";
 const router = useRouter();
 const route = useRoute();
 
-
 // Store de company
 const useCompany = useCompanyStore();
 const { company } = storeToRefs(useCompany);
@@ -81,8 +80,9 @@ const navigateTo = (path) => {
                         v-show="item.all_children_menus.length > 0" density="compact" rounded="lg"></v-list-item>
                 </template>
 
-                <v-list-item v-for="(child, i) in item.all_children_menus" :key="i" density="compact" class="my-1"
-                    rounded="lg" @click.prevent="navigateTo(child.permission.slug)">
+                <v-list-item v-for="(child, i) in item.all_children_menus" :key="i" rounded="lg"
+                    @click.prevent="navigateTo(child.permission.slug)"
+                    :class="{ active: child.permission.slug === selectedMenu }" density="compact" class="my-1">
                     <template v-slot:prepend>
                         <v-icon :icon="child.icon"></v-icon>
                     </template>
