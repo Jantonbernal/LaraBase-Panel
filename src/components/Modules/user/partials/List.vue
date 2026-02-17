@@ -9,6 +9,7 @@ import { useModalStore } from "@/stores/modal.js";
 // Importar composables
 import useUser from "@/composables/services/user";
 import { useTablePagination } from "@/composables/logic/useTablePagination";
+import useStatusManager from "@/composables/logic/useStatusManager";
 // Importar componentes
 import Loading from '@/components/Common/Loading.vue';
 import Alert from '@/components/Common/Alert.vue';
@@ -16,9 +17,6 @@ import Paginator from '@/components/Common/Paginator.vue';
 import BaseTable from '@/components/Common/BaseTable.vue';
 import View from '../pages/View.vue'
 import AssignPermission from '../pages/AssignPermission.vue'
-// Importar utilidades
-import { showAlert, showConfirmAlert } from "@/utils/swalUtils";
-import { showToast } from '@/utils/toastUtils';
 
 // Router inicializado
 const router = useRouter();
@@ -37,6 +35,7 @@ const {
     dataToggleUser, toggleUser, loadingToggleUser, errorToggleUser
 } = useUser();
 const { page, search, resetAndFetch } = useTablePagination(indexUsers)
+const { changeStatus } = useStatusManager();
 
 onMounted(async () => {
     resetAndFetch();
@@ -55,23 +54,13 @@ const create = () => router.push({ name: 'usuario.crear' });
 
 const edit = (id) => router.push({ name: "usuario.editar", params: { id } });
 
-const changeStatus = async (item) => {
-    if (!dataIndexUsers.value?.data.length) {
-        return showAlert({ title: "No hay registros seleccionados", text: "Selecciona al menos un registros.", icon: "warning" });
-    }
-
-    const confirmed = await showConfirmAlert(
-        `¿Estás seguro de realizar esta acción?`,
-    );
-
-    if (!confirmed) {
-        return showAlert({ title: "Acción cancelada", text: "No se cambió el registro.", icon: "info" });
-    }
-
-    dataToggleUser.value = null
-    errorToggleUser.value = null
-
-    toggleUser(item.id);
+const handleChangeStatus = (item) => {
+    changeStatus(item, {
+        toggleMethod: toggleUser,
+        dataRef: dataToggleUser,
+        errorRef: errorToggleUser,
+        onSuccess: resetAndFetch
+    });
 };
 
 const showModal = (modalName, id = null) => {
@@ -82,19 +71,6 @@ const showModal = (modalName, id = null) => {
 const closeModal = () => {
     resetAndFetch()
 }
-
-watch(dataToggleUser, (received) => {
-    if (received) {
-        resetAndFetch()
-        showToast(received?.message, 'success', 5000)
-    }
-})
-
-watch(errorToggleUser, (received) => {
-    if (received) {
-        showToast(received?.data?.message || "Ocurrió un error", 'error', 5000)
-    }
-})
 </script>
 
 <template>
@@ -155,7 +131,7 @@ watch(errorToggleUser, (received) => {
                                 <v-btn v-bind="props" :color="item.status == 1 ? 'error' : 'success'"
                                     density="comfortable"
                                     :icon="item.status == 1 ? 'mdi-delete-empty' : 'mdi-check-bold'" size="small"
-                                    @click.prevent="changeStatus(item)">
+                                    @click.prevent="handleChangeStatus(item)">
                                 </v-btn>
                             </template>
                         </v-tooltip>

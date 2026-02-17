@@ -8,6 +8,7 @@ import { useModalStore } from "@/stores/modal.js";
 // Importar composables
 import useRole from "@/composables/services/role";
 import { useTablePagination } from "@/composables/logic/useTablePagination";
+import useStatusManager from "@/composables/logic/useStatusManager";
 // Importar componentes
 import Loading from '@/components/Common/Loading.vue';
 import Alert from '@/components/Common/Alert.vue';
@@ -16,9 +17,6 @@ import BaseTable from '@/components/Common/BaseTable.vue';
 import Create from '../pages/Create.vue'
 import Edit from '../pages/Edit.vue'
 import View from '../pages/View.vue'
-// Importar utilidades
-import { showAlert, showConfirmAlert } from "@/utils/swalUtils";
-import { showToast } from '@/utils/toastUtils';
 
 // Store de accesos
 const useAccess = useAccessStore();
@@ -34,6 +32,7 @@ const {
     dataToggleRole, toggleRole, loadingToggleRole, errorToggleRole
 } = useRole();
 const { page, search, resetAndFetch } = useTablePagination(indexRoles)
+const { changeStatus } = useStatusManager();
 
 onMounted(async () => {
     resetAndFetch();
@@ -47,23 +46,13 @@ const headers = [
     { title: 'Acciones', key: 'actions' },
 ];
 
-const changeStatus = async (item) => {
-    if (!dataIndexRoles.value?.data.length) {
-        return showAlert({ title: "No hay registros seleccionados", text: "Selecciona al menos un registros.", icon: "warning" });
-    }
-
-    const confirmed = await showConfirmAlert(
-        `¿Estás seguro de realizar esta acción?`,
-    );
-
-    if (!confirmed) {
-        return showAlert({ title: "Acción cancelada", text: "No se cambió el registro.", icon: "info" });
-    }
-
-    dataToggleRole.value = null
-    errorToggleRole.value = null
-
-    toggleRole(item.id);
+const handleChangeStatus = (item) => {
+    changeStatus(item, {
+        toggleMethod: toggleRole,
+        dataRef: dataToggleRole,
+        errorRef: errorToggleRole,
+        onSuccess: resetAndFetch
+    });
 };
 
 const showModal = (modalName, id = null) => {
@@ -74,19 +63,6 @@ const showModal = (modalName, id = null) => {
 const closeModal = () => {
     resetAndFetch()
 }
-
-watch(dataToggleRole, (received) => {
-    if (received) {
-        resetAndFetch()
-        showToast(received?.message, 'success', 5000)
-    }
-})
-
-watch(errorToggleRole, (received) => {
-    if (received) {
-        showToast(received?.data?.message || "Ocurrió un error", 'error', 5000)
-    }
-})
 </script>
 
 <template>
@@ -146,7 +122,7 @@ watch(errorToggleRole, (received) => {
                                 <v-btn v-bind="props" :color="item.status == 1 ? 'error' : 'success'"
                                     density="comfortable"
                                     :icon="item.status == 1 ? 'mdi-delete-empty' : 'mdi-check-bold'" size="small"
-                                    @click.prevent="changeStatus(item)">
+                                    @click.prevent="handleChangeStatus(item)">
                                 </v-btn>
                             </template>
                         </v-tooltip>

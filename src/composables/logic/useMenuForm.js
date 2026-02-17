@@ -1,6 +1,7 @@
 import { computed, reactive, ref, watch } from "vue"
 import { useVuelidate } from '@vuelidate/core'
 import { useTablePagination } from '@/composables/logic/useTablePagination';
+import useStatusManager from "@/composables/logic/useStatusManager";
 import { m } from '@/composables/logic/useValidationUtils'
 import { showAlert, showConfirmAlert } from "@/utils/swalUtils";
 import { showToast } from '@/utils/toastUtils';
@@ -12,6 +13,7 @@ export default function useMenuForm(permissions, menuService, authService, menus
         search,
         resetAndFetch: searchResults // Renombramos resetAndFetch a searchResults para no romper el resto de tu código
     } = useTablePagination(menuService.indexMenus);
+    const { changeStatus } = useStatusManager();
 
     // Params Tree
     const mode = ref(null);
@@ -99,20 +101,12 @@ export default function useMenuForm(permissions, menuService, authService, menus
     };
 
     const handleStatusChange = async (item) => {
-        if (!menuService.dataIndexMenus.value?.data.length) return;
-
-        const confirmed = await showConfirmAlert(`¿Estás seguro de realizar esta acción?`);
-
-        if (!confirmed) {
-            return showAlert({ title: "Acción cancelada", text: "No se cambió el registro.", icon: "info" });
-        }
-
-        if (confirmed) {
-            menuService.dataToggleMenu.value = null
-            menuService.errorToggleMenu.value = null
-
-            menuService.toggleMenu(item.id);
-        }
+        changeStatus(item, {
+            toggleMethod: menuService.toggleMenu,
+            dataRef: menuService.dataToggleMenu,
+            errorRef: menuService.errorToggleMenu,
+            onSuccess: searchResults
+        });
     };
 
     const save = async () => {

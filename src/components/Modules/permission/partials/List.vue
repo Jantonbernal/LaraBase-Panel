@@ -8,6 +8,7 @@ import { useModalStore } from "@/stores/modal.js";
 // Importar composables
 import usePermission from "@/composables/services/permission";
 import { useTablePagination } from "@/composables/logic/useTablePagination";
+import useStatusManager from "@/composables/logic/useStatusManager";
 // Importar componentes
 import Loading from '@/components/Common/Loading.vue';
 import Alert from '@/components/Common/Alert.vue';
@@ -15,10 +16,6 @@ import Paginator from '@/components/Common/Paginator.vue';
 import BaseTable from '@/components/Common/BaseTable.vue';
 import Create from '../pages/Create.vue'
 import Edit from '../pages/Edit.vue'
-
-// Importar utilidades
-import { showAlert, showConfirmAlert } from "@/utils/swalUtils";
-import { showToast } from '@/utils/toastUtils';
 
 // Store de accesos
 const useAccess = useAccessStore();
@@ -34,6 +31,7 @@ const {
     dataTogglePermission, togglePermission, loadingTogglePermission, errorTogglePermission
 } = usePermission();
 const { page, search, resetAndFetch } = useTablePagination(indexPermissions)
+const { changeStatus } = useStatusManager();
 
 onMounted(async () => {
         resetAndFetch();
@@ -48,23 +46,13 @@ const headers = [
     { title: 'Acciones', key: 'actions' },
 ];
 
-const changeStatus = async (item) => {
-    if (!dataIndexPermissions.value?.data.length) {
-        return showAlert({ title: "No hay registros seleccionados", text: "Selecciona al menos un registros.", icon: "warning" });
-    }
-
-    const confirmed = await showConfirmAlert(
-        `¿Estás seguro de realizar esta acción?`,
-    );
-
-    if (!confirmed) {
-        return showAlert({ title: "Acción cancelada", text: "No se cambió el registro.", icon: "info" });
-    }
-
-    dataTogglePermission.value = null
-    errorTogglePermission.value = null
-
-    togglePermission(item.id);
+const handleChangeStatus = (item) => {
+    changeStatus(item, {
+        toggleMethod: togglePermission,
+        dataRef: dataTogglePermission,
+        errorRef: errorTogglePermission,
+        onSuccess: resetAndFetch
+    });
 };
 
 const showModal = (modalName, id = null) => {
@@ -75,19 +63,6 @@ const showModal = (modalName, id = null) => {
 const closeModal = () => {
     resetAndFetch()
 }
-
-watch(dataTogglePermission, (received) => {
-    if (received) {
-        resetAndFetch()
-        showToast(received?.message, 'success', 5000)
-    }
-})
-
-watch(errorTogglePermission, (received) => {
-    if (received) {
-        showToast(received?.data?.message || "Ocurrió un error", 'error', 5000)
-    }
-})
 </script>
 
 <template>
@@ -139,7 +114,7 @@ watch(errorTogglePermission, (received) => {
                                 <v-btn v-bind="props" :color="item.status == 1 ? 'error' : 'success'"
                                     density="comfortable"
                                     :icon="item.status == 1 ? 'mdi-delete-empty' : 'mdi-check-bold'" size="small"
-                                    @click.prevent="changeStatus(item)">
+                                    @click.prevent="handleChangeStatus(item)">
                                 </v-btn>
                             </template>
                         </v-tooltip>
