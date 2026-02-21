@@ -58,7 +58,7 @@ const navigateTo = (path) => {
         
         <div class="d-flex align-center mb-5 cursor-pointer">
             <v-avatar size="35" class="me-3">
-                <img v-if="company?.logo?.url" :src="company.logo.url" alt="logo" />
+                <v-img v-if="company?.logo?.url" :src="company.logo.url" alt="logo" cover/>
                 <v-icon v-else icon="mdi-account-tie"></v-icon>
             </v-avatar>
             <span class="company-title font-weight-bold"> {{ company?.business_name }} </span>

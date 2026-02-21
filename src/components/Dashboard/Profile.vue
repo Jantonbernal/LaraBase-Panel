@@ -93,7 +93,7 @@ const verifyModalToChange = (item) => {
         <template v-slot:activator="{ props }">
             <v-btn variant="text" v-bind="props" icon>
                 <v-avatar size="35">
-                    <img v-if="access?.access?.photo" :src="access?.access?.photo.url" height="35" alt="user" />
+                    <v-img v-if="access?.photo" :src="access?.photo.url" height="35" alt="user" cover />
                     <v-icon v-else icon="mdi mdi-account-tie"></v-icon>
                 </v-avatar>
             </v-btn>
